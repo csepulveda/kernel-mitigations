@@ -3,6 +3,8 @@ name: Build and Push
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'chart/**'
   workflow_dispatch:
 
 env:
@@ -15,6 +17,8 @@ permissions:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.build.outputs.tag }}
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
@@ -22,9 +26,11 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Build and push
+        id: build
         run: |
           TAG="${GITHUB_SHA::8}"
           docker build -t "${{ env.IMAGE }}:${TAG}" -t "${{ env.IMAGE }}:latest" .
           docker push "${{ env.IMAGE }}:${TAG}"
           docker push "${{ env.IMAGE }}:latest"
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
           echo "Pushed: ${{ env.IMAGE }}:${TAG}"
