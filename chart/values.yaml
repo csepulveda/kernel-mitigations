@@ -1,5 +1,5 @@
 image:
-  repository: ghcr.io/r2capital/r2-kernel-mitigations
+  repository: ghcr.io/csepulveda/kernel-mitigations
   tag: "b5f5e050"
   pullPolicy: Always
 
