@@ -1,0 +1,6 @@
+apiVersion: v2
+name: r2-kernel-mitigation
+description: CVE-2026-31431 mitigation — disables algif_aead kernel module
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: cve-2026-31431-mitigation
+  namespace: kube-system
+  labels:
+    app: cve-2026-31431-mitigation
+spec:
+  selector:
+    matchLabels:
+      app: cve-2026-31431-mitigation
+  template:
+    metadata:
+      labels:
+        app: cve-2026-31431-mitigation
+    spec:
+      tolerations:
+        {{- toYaml .Values.tolerations | nindent 8 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      initContainers:
+        - name: mitigate
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: host-modprobe-d
+              mountPath: /host-modprobe-d
+            - name: host-os-release
+              mountPath: /host-os-release
+              readOnly: true
+      containers:
+        - name: pause
+          image: gcr.io/google-containers/pause:3.9
+          resources:
+            requests:
+              cpu: 1m
+              memory: 1Mi
+            limits:
+              cpu: 5m
+              memory: 5Mi
+      volumes:
+        - name: host-modprobe-d
+          hostPath:
+            path: /etc/modprobe.d
+            type: DirectoryOrCreate
+        - name: host-os-release
+          hostPath:
+            path: /etc/os-release
+            type: File
+      terminationGracePeriodSeconds: 5
