@@ -1,6 +1,6 @@
 image:
   repository: ghcr.io/csepulveda/kernel-mitigations
-  tag: "801a7ef2"
+  tag: "17cf5e30"
   pullPolicy: Always
 
 tolerations:
